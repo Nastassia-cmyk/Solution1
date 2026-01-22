@@ -1,0 +1,131 @@
+﻿.task-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.task-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem;
+  background: #fafafa;
+  cursor: pointer;
+  user-select: none;
+}
+
+.task-card-title-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex: 1;
+}
+
+.task-card-title-section h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  flex: 1;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.task-card-title-section h4:hover {
+  background-color: #f0f0f0;
+}
+
+.task-card-title-section input {
+  padding: 0.5rem;
+  border: 1px solid #667eea;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.task-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.delete-btn {
+  background: #fee;
+  color: #c33;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: #fdd;
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-card-body {
+  padding: 1.2rem;
+  border-top: 1px solid #eee;
+}
+
+.task-description {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.task-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.meta-item {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.meta-item strong {
+  color: #333;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.meta-item span,
+.meta-item select {
+  display: block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.meta-item span:hover {
+  background-color: #f0f0f0;
+}
+
+.meta-item select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

@@ -1,0 +1,32 @@
+﻿.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-badge.badge-todo {
+  background-color: #fef3cd;
+  color: #856404;
+}
+
+.status-badge.badge-in-progress {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-badge.badge-done {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+select.status-badge {
+  padding: 0.5rem 0.8rem;
+}
