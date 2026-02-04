@@ -12,6 +12,7 @@ A modern task management application for small teams (3-10 people) built with No
 - **Team Members**: Pre-configured team members for assignment and comments
 - **Flexible Storage**: Choose between in-memory or persistent JSON file storage
 - **Admin Dashboard**: Separate admin interface for system administration and settings
+- **Storage Configuration**: Change repository type (in-memory/JSON) through admin settings with restart notification
 - **Hash-Based Routing**: Navigate between Task Manager and Admin pages using URL hashes
 
 ## Tech Stack
@@ -39,11 +40,14 @@ Solution1/
 │   │   ├── server.ts            # Express setup & entry point
 │   │   ├── types.ts             # TypeScript interfaces
 │   │   ├── routes/
-│   │   │   └── taskRoutes.ts    # API routes
+│   │   │   ├── taskRoutes.ts    # Task API routes
+│   │   │   └── adminRoutes.ts   # Admin API routes
 │   │   ├── controllers/
-│   │   │   └── taskController.ts # Request handlers
+│   │   │   ├── taskController.ts # Task request handlers
+│   │   │   └── settingsController.ts # Settings request handlers
 │   │   ├── services/
-│   │   │   └── TaskService.ts   # Business logic
+│   │   │   ├── TaskService.ts   # Task business logic
+│   │   │   └── SettingsService.ts # Settings business logic
 │   │   ├── repositories/        # Data persistence abstraction
 │   │   │   ├── TaskRepository.ts # Repository interface
 │   │   │   ├── InMemoryTaskRepository.ts # In-memory implementation
@@ -51,7 +55,9 @@ Solution1/
 │   │   │   └── RepositoryFactory.ts    # Factory for repository selection
 │   │   └── utils/
 │   │       └── fileOperations.ts # Safe file I/O utilities
-│   ├── data/                    # Task data storage (auto-created, JSON mode only)
+│   ├── data/                    # Task & settings data storage (auto-created)
+│   │   ├── tasks.json           # Tasks data (JSON mode only)
+│   │   └── settings.json        # Admin settings (auto-created)
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── .env.example             # Environment configuration template
@@ -63,27 +69,33 @@ Solution1/
 │   │   ├── App.tsx              # Main app router component
 │   │   ├── types.ts             # TypeScript interfaces
 │   │   ├── context/
-│   │   │   └── AppContext.tsx   # Global state management
+│   │   │   ├── AppContext.tsx   # Global state management
+│   │   │   └── SettingsContext.tsx # Admin settings state
 │   │   ├── components/
 │   │   │   ├── TaskForm.tsx     # Create task form
 │   │   │   ├── TaskCard.tsx     # Task display card
 │   │   │   ├── CommentSection.tsx # Comments UI
 │   │   │   ├── StatusBadge.tsx  # Status indicator
+│   │   │   ├── RestartWarning.tsx # Restart notification
 │   │   │   ├── pages/           # Page components
 │   │   │   │   ├── TaskPage.tsx # Task manager page
-│   │   │   │   └── TaskPage.css
+│   │   │   │   ├── SettingsPage.tsx # Admin settings page
+│   │   │   │   ├── TaskPage.css
+│   │   │   │   └── SettingsPage.css
 │   │   │   └── layouts/         # Layout components
 │   │   │       ├── AdminLayout.tsx # Admin dashboard layout
 │   │   │       └── AdminLayout.css
 │   │   ├── hooks/
 │   │   │   └── useAppContext.ts # Context hook
 │   │   ├── services/
-│   │   │   └── api.ts           # API client
+│   │   │   ├── api.ts           # Task API client
+│   │   │   └── settingsApi.ts   # Settings API client
 │   │   ├── styles/
 │   │   │   ├── TaskForm.css
 │   │   │   ├── TaskCard.css
 │   │   │   ├── StatusBadge.css
-│   │   │   └── CommentSection.css
+│   │   │   ├── CommentSection.css
+│   │   │   └── RestartWarning.css
 │   │   ├── App.css
 │   │   └── main.css
 │   ├── index.html
@@ -211,7 +223,8 @@ The frontend uses hash-based routing to navigate between different sections:
 | Route | Description |
 |-------|-------------|
 | `/#/tasks` | Task Manager (default) - Main task management interface |
-| `/#/admin` | Admin Dashboard - Administration and settings page |
+| `/#/admin` | Admin Dashboard - Administration overview page |
+| `/#/admin/settings` | Admin Settings - Configure storage type and system settings |
 
 ### Switching Between Routes
 
@@ -224,6 +237,7 @@ You can navigate between routes in two ways:
 2. **Using URL Hash**: Manually change the URL hash
    - Go to `http://localhost:3000/#/tasks` for task manager
    - Go to `http://localhost:3000/#/admin` for admin dashboard
+   - Go to `http://localhost:3000/#/admin/settings` for settings
 
 ## API Endpoints
 
@@ -244,6 +258,13 @@ You can navigate between routes in two ways:
 | GET | `/api/tasks/:taskId/comments` | Get task comments |
 | POST | `/api/tasks/:taskId/comments` | Add comment |
 | DELETE | `/api/tasks/comments/:commentId` | Delete comment |
+
+### Admin Settings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/settings` | Get current admin settings (repository type) |
+| POST | `/api/admin/settings` | Save admin settings (requires server restart) |
 
 ### Example Requests
 
@@ -272,6 +293,33 @@ POST /api/tasks/abc123/comments
 {
   "author": "Charlie",
   "text": "Started working on this task"
+}
+```
+
+**Get Settings:**
+```json
+GET /api/admin/settings
+
+Response:
+{
+  "taskRepo": "memory"
+}
+```
+
+**Save Settings:**
+```json
+POST /api/admin/settings
+{
+  "taskRepo": "json"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Settings saved successfully. Server restart required to apply changes.",
+  "settings": {
+    "taskRepo": "json"
+  }
 }
 ```
 
@@ -341,15 +389,26 @@ These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
 - Delete comments using the ✕ button
 - Comments auto-load when expanding a task
 
+### Admin Settings
+- Access via "Settings" in the admin sidebar (requires navigating to Admin Dashboard first)
+- View current storage type (In-Memory or JSON File)
+- Change repository type through a dropdown selector
+- Orange warning message indicates that server restart is required to apply changes
+- Settings are persisted to `api/data/settings.json`
+- After saving settings, you must restart the backend server for changes to take effect
+
 ## Development Notes
 
 ### State Management
 - Uses React Context API for global state
-- Centralized in `AppContext.tsx`
-- Custom hook `useAppContext()` for component access
+- Task state in `AppContext.tsx`
+- Settings state in `SettingsContext.tsx`
+- Custom hooks for component access (`useAppContext()`, etc.)
 
 ### API Client
-- Centralized API calls in `services/api.ts`
+- Centralized API calls in `services/` directory
+  - `api.ts` for task-related API calls
+  - `settingsApi.ts` for admin settings API calls
 - Object-based structure for organization
 - Error handling at service level
 

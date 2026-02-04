@@ -1,5 +1,6 @@
-﻿import express, { Express, Request, Response, NextFunction } from 'express';
+﻿﻿import express, { Express, Request, Response, NextFunction } from 'express';
 import taskRoutes from './routes/taskRoutes';
+import adminRoutes from './routes/adminRoutes';
 import taskService from './services/TaskService';
 import { RepositoryFactory } from './repositories/RepositoryFactory';
 
@@ -28,6 +29,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Routes
 app.use('/api/tasks', taskRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {

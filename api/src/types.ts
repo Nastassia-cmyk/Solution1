@@ -1,4 +1,5 @@
 ﻿export type TaskStatus = 'todo' | 'in-progress' | 'done';
+export type RepositoryType = 'memory' | 'json';
 
 export interface Task {
   id: string;
@@ -34,4 +35,8 @@ export interface UpdateTaskInput {
 export interface CreateCommentInput {
   author: string;
   text: string;
+}
+
+export interface AdminSettings {
+  taskRepo: RepositoryType;
 }

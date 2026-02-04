@@ -1,4 +1,4 @@
-﻿﻿import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import TaskPage from './components/pages/TaskPage';
 import AdminLayout from './components/layouts/AdminLayout';
 import './App.css';
@@ -19,7 +19,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  if (currentRoute === '/admin') {
+  if (currentRoute.startsWith('/admin')) {
     return <AdminLayout />;
   }
 

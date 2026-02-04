@@ -1,7 +1,41 @@
-﻿import React from 'react';
+﻿﻿import React, { useState, useEffect } from 'react';
+import SettingsPage from '../pages/SettingsPage';
+import { SettingsProvider } from '../../context/SettingsContext';
 import './AdminLayout.css';
 
 export const AdminLayout: React.FC = () => {
+  const [currentAdminRoute, setCurrentAdminRoute] = useState<string>(() => {
+    const hash = window.location.hash.slice(1) || '/admin';
+    return hash;
+  });
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || '/admin';
+      setCurrentAdminRoute(hash);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const renderAdminContent = () => {
+    if (currentAdminRoute === '/admin/settings') {
+      return (
+        <SettingsProvider>
+          <SettingsPage />
+        </SettingsProvider>
+      );
+    }
+
+    return (
+      <div className="admin-welcome">
+        <h2>Welcome to Admin Dashboard</h2>
+        <p>Select an option from the sidebar to get started.</p>
+      </div>
+    );
+  };
+
   return (
     <div className="admin-root">
       <header className="admin-header">
@@ -25,16 +59,20 @@ export const AdminLayout: React.FC = () => {
               <ul className="admin-menu">
                 <li><a href="#/admin/overview" className="admin-menu-item">Overview</a></li>
                 <li><a href="#/admin/users" className="admin-menu-item">Users</a></li>
-                <li><a href="#/admin/settings" className="admin-menu-item">Settings</a></li>
+                <li>
+                  <a 
+                    href="#/admin/settings" 
+                    className={`admin-menu-item ${currentAdminRoute === '/admin/settings' ? 'active' : ''}`}
+                  >
+                    Settings
+                  </a>
+                </li>
               </ul>
             </div>
           </aside>
 
           <section className="admin-content">
-            <div className="admin-welcome">
-              <h2>Welcome to Admin Dashboard</h2>
-              <p>Select an option from the sidebar to get started.</p>
-            </div>
+            {renderAdminContent()}
           </section>
         </div>
       </main>
