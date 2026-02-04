@@ -1,8 +1,14 @@
 ﻿import express, { Express, Request, Response, NextFunction } from 'express';
 import taskRoutes from './routes/taskRoutes';
+import taskService from './services/TaskService';
+import { RepositoryFactory } from './repositories/RepositoryFactory';
 
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
+
+// Initialize repository and inject into TaskService
+const repository = RepositoryFactory.createRepository();
+taskService.setRepository(repository);
 
 // Middleware
 app.use(express.json());

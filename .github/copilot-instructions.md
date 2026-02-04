@@ -1,15 +1,15 @@
 ﻿## Documentation
 
-Don't create any *.md files with documentation. 
+Don't create any *.md files with documentation.
 
 You can only expand and update the existing README.md file so that it matches the latest changes made in the project.
 
 Requirements:
 
- - Update only README.md
- - Update the description of functionality, installation, launch, and usage examples.
- - If there are new commands, parameters, or modules, add them to the README.
- - Keep the structure of the README clear and logical.
+- Update only README.md
+- Update the description of functionality, installation, launch, and usage examples.
+- If there are new commands, parameters, or modules, add them to the README.
+- Keep the structure of the README clear and logical.
 
 Bottom line: one updated file README.md, reflecting the current status of the project.
 

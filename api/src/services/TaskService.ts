@@ -1,20 +1,37 @@
 ﻿import { v4 as uuidv4 } from 'uuid';
 import { Task, Comment, CreateTaskInput, UpdateTaskInput, CreateCommentInput } from '../types';
+import { ITaskRepository } from '../repositories/TaskRepository';
 
 class TaskService {
-  private tasks: Map<string, Task> = new Map();
-  private comments: Map<string, Comment> = new Map();
+  private repository?: ITaskRepository;
+
+  /**
+   * Initialize TaskService with a repository instance
+   * This allows the service to use different persistence strategies
+   */
+  setRepository(repository: ITaskRepository): void {
+    this.repository = repository;
+  }
 
   // Task operations
   getAllTasks(): Task[] {
-    return Array.from(this.tasks.values());
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    return this.repository.getAllTasks();
   }
 
   getTaskById(id: string): Task | undefined {
-    return this.tasks.get(id);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    return this.repository.getTaskById(id);
   }
 
   createTask(input: CreateTaskInput): Task {
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
     const id = uuidv4();
     const now = new Date();
     const task: Task = {
@@ -24,12 +41,15 @@ class TaskService {
       createdAt: now,
       updatedAt: now,
     };
-    this.tasks.set(id, task);
+    this.repository.createTask(task);
     return task;
   }
 
   updateTask(id: string, input: UpdateTaskInput): Task | undefined {
-    const task = this.tasks.get(id);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    const task = this.repository.getTaskById(id);
     if (!task) return undefined;
 
     const updated: Task = {
@@ -37,27 +57,30 @@ class TaskService {
       ...input,
       updatedAt: new Date(),
     };
-    this.tasks.set(id, updated);
+    this.repository.updateTask(id, updated);
     return updated;
   }
 
   deleteTask(id: string): boolean {
-    // Also delete associated comments
-    const commentsToDelete = Array.from(this.comments.values())
-      .filter(c => c.taskId === id)
-      .map(c => c.id);
-    
-    commentsToDelete.forEach(commentId => this.comments.delete(commentId));
-    return this.tasks.delete(id);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    return this.repository.deleteTask(id);
   }
 
   // Comment operations
   getTaskComments(taskId: string): Comment[] {
-    return Array.from(this.comments.values()).filter(c => c.taskId === taskId);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    return this.repository.getTaskComments(taskId);
   }
 
   addComment(taskId: string, input: CreateCommentInput): Comment | undefined {
-    const task = this.tasks.get(taskId);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    const task = this.repository.getTaskById(taskId);
     if (!task) return undefined;
 
     const id = uuidv4();
@@ -67,12 +90,23 @@ class TaskService {
       ...input,
       createdAt: new Date(),
     };
-    this.comments.set(id, comment);
+    this.repository.addTaskComment(taskId, comment);
     return comment;
   }
 
   deleteComment(id: string): boolean {
-    return this.comments.delete(id);
+    if (!this.repository) {
+      throw new Error('TaskService not initialized with a repository');
+    }
+    // Find the taskId by checking all tasks' comments
+    const allTasks = this.repository.getAllTasks();
+    for (const task of allTasks) {
+      const comments = this.repository.getTaskComments(task.id);
+      if (comments.some(c => c.id === id)) {
+        return this.repository.deleteTaskComment(task.id, id);
+      }
+    }
+    return false;
   }
 }
 

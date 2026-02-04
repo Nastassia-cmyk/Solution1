@@ -1,4 +1,4 @@
-﻿# Task Manager MVP
+﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
@@ -10,14 +10,16 @@ A modern task management application for small teams (3-10 people) built with No
 - **Comments**: Add and manage comments on tasks
 - **Filtering**: Filter tasks by status
 - **Team Members**: Pre-configured team members for assignment and comments
-- **In-Memory Storage**: All data persists during the session
+- **Flexible Storage**: Choose between in-memory or persistent JSON file storage
 
 ## Tech Stack
 
 ### Backend
 - **Node.js** with Express.js
 - **TypeScript** for type safety
-- **In-Memory Storage** (Maps) for data persistence
+- **Repository Pattern** for flexible data persistence
+- **Storage Options**: In-Memory (Maps) or JSON File
+- **Atomic File Operations** for data integrity
 
 ### Frontend
 - **React 18** with Hooks
@@ -37,10 +39,19 @@ Solution1/
 │   │   │   └── taskRoutes.ts    # API routes
 │   │   ├── controllers/
 │   │   │   └── taskController.ts # Request handlers
-│   │   └── services/
-│   │       └── TaskService.ts   # Business logic & data
+│   │   ├── services/
+│   │   │   └── TaskService.ts   # Business logic
+│   │   ├── repositories/        # Data persistence abstraction
+│   │   │   ├── TaskRepository.ts # Repository interface
+│   │   │   ├── InMemoryTaskRepository.ts # In-memory implementation
+│   │   │   ├── JsonTaskRepository.ts    # JSON file implementation
+│   │   │   └── RepositoryFactory.ts    # Factory for repository selection
+│   │   └── utils/
+│   │       └── fileOperations.ts # Safe file I/O utilities
+│   ├── data/                    # Task data storage (auto-created, JSON mode only)
 │   ├── package.json
 │   ├── tsconfig.json
+│   ├── .env.example             # Environment configuration template
 │   └── .gitignore
 │
 ├── web/                          # Frontend React App
@@ -95,6 +106,61 @@ npm install
 ```bash
 cd web
 npm install
+```
+
+## Configuration
+
+### Data Persistence
+
+The Task Manager supports flexible data persistence strategies configured via the `TASK_REPO` environment variable:
+
+#### In-Memory Mode (Default)
+- **Environment**: `TASK_REPO=memory` (or not set)
+- **Storage**: Data stored in application memory using Maps
+- **Persistence**: Data is lost when the application restarts
+- **Use Case**: Development, testing, prototyping
+- **No setup required**: Works out of the box
+
+#### JSON File Mode
+- **Environment**: `TASK_REPO=json`
+- **Storage**: Data persisted to `api/data/tasks.json`
+- **Persistence**: Data survives application restarts
+- **Features**: Atomic writes using temp file + rename pattern (prevents corruption)
+- **Use Case**: Production, persistent data storage
+
+### Setting Environment Variables
+
+#### Option 1: Create `.env` file in `api/` folder
+```bash
+cd api
+cp .env.example .env
+# Edit .env and set: TASK_REPO=json
+```
+
+#### Option 2: Set environment variable before running
+**Linux/Mac:**
+```bash
+cd api
+TASK_REPO=json npm run dev
+```
+
+**Windows (PowerShell):**
+```powershell
+cd api
+$env:TASK_REPO="json"; npm run dev
+```
+
+**Windows (CMD):**
+```cmd
+cd api
+set TASK_REPO=json
+npm run dev
+```
+
+#### Option 3: Use .env during production
+When running the compiled application, load the .env file using dotenv:
+```bash
+node -r dotenv/config dist/server.js
 ```
 
 ## Running the Application
@@ -286,9 +352,12 @@ These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
 - Check browser console for errors
 
 ### Tasks not persisting
-- This is expected! Data is stored in-memory only
-- Refreshing the page will reset all data
-- This is by design for the MVP
+- **In-Memory Mode** (default): Data is stored in-memory only. Refreshing the page or restarting the app will reset all data. This is expected behavior.
+- **JSON File Mode**: If using `TASK_REPO=json`, data is persisted to `api/data/tasks.json`. Check that:
+  - The `api/data/` directory was created automatically
+  - The file `api/data/tasks.json` exists with task data
+  - The `api/data/` directory has write permissions
+  - Set `TASK_REPO=json` environment variable before starting the app
 
 ## Project Structure Principles
 
