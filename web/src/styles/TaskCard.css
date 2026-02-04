@@ -1,4 +1,4 @@
-﻿.task-card {
+﻿﻿.task-card {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -23,7 +23,7 @@
 
 .task-card-title-section {
   display: flex;
-  gap: 1rem;
+  gap: 0.8rem;
   align-items: center;
   flex: 1;
 }
@@ -55,6 +55,7 @@
 .task-card-actions {
   display: flex;
   gap: 0.5rem;
+  margin-left: 1.5rem;
 }
 
 .delete-btn {
