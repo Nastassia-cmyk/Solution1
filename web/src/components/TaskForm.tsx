@@ -1,13 +1,14 @@
 ﻿import React, { useState } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
+import { User } from '../types';
 import '../styles/TaskForm.css';
 
 interface TaskFormProps {
   onSuccess?: () => void;
-  teamMembers: string[];
+  users: User[];
 }
 
-export const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, teamMembers }) => {
+export const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, users }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assignee, setAssignee] = useState('');
@@ -16,7 +17,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, teamMembers }) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addTask({ title, description, assignee: assignee || undefined });
+      await addTask({ title, description, assignee: assignee ? parseInt(assignee) : undefined });
       setTitle('');
       setDescription('');
       setAssignee('');
@@ -60,8 +61,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, teamMembers }) =>
           onChange={(e) => setAssignee(e.target.value)}
         >
           <option value="">Unassigned</option>
-          {teamMembers.map(member => (
-            <option key={member} value={member}>{member}</option>
+          {users.map(user => (
+            <option key={user.id} value={user.id}>{user.name}</option>
           ))}
         </select>
       </div>

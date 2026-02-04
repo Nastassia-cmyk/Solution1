@@ -1,17 +1,22 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
+import { User } from '../../types';
+import { settingsApi } from '../../services/settingsApi';
 import { TaskForm } from '../TaskForm';
 import { TaskCard } from '../TaskCard';
 import './TaskPage.css';
 
-const TEAM_MEMBERS = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'];
-
 export const TaskPage: React.FC = () => {
   const { tasks, loadTasks, loading, error } = useAppContext();
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     loadTasks();
+    // Load users from settings
+    settingsApi.getSettings()
+      .then(settings => setUsers(settings.users))
+      .catch(err => console.error('Failed to load users:', err));
   }, [loadTasks]);
 
   const filteredTasks = filterStatus
@@ -40,7 +45,7 @@ export const TaskPage: React.FC = () => {
       <main className="page-main">
         <div className="page-layout">
           <aside className="page-sidebar">
-            <TaskForm teamMembers={TEAM_MEMBERS} onSuccess={loadTasks} />
+            <TaskForm users={users} onSuccess={loadTasks} />
           </aside>
 
           <section className="page-content">
@@ -97,7 +102,7 @@ export const TaskPage: React.FC = () => {
                 </p>
               ) : (
                 filteredTasks.map(task => (
-                  <TaskCard key={task.id} task={task} teamMembers={TEAM_MEMBERS} />
+                  <TaskCard key={task.id} task={task} users={users} />
                 ))
               )}
             </div>

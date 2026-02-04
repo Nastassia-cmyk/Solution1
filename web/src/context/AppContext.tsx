@@ -6,11 +6,11 @@ interface AppContextType {
   tasks: Task[];
   comments: Map<string, Comment[]>;
   loadTasks: () => Promise<void>;
-  addTask: (data: { title: string; description: string; assignee?: string }) => Promise<void>;
+  addTask: (data: { title: string; description: string; assignee?: number }) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   loadComments: (taskId: string) => Promise<void>;
-  addComment: (taskId: string, data: { author: string; text: string }) => Promise<void>;
+  addComment: (taskId: string, data: { author: number; text: string }) => Promise<void>;
   deleteComment: (taskId: string, commentId: string) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -37,7 +37,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const addTask = useCallback(async (data: { title: string; description: string; assignee?: string }) => {
+  const addTask = useCallback(async (data: { title: string; description: string; assignee?: number }) => {
     setLoading(true);
     setError(null);
     try {
@@ -92,7 +92,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const addComment = useCallback(async (taskId: string, data: { author: string; text: string }) => {
+  const addComment = useCallback(async (taskId: string, data: { author: number; text: string }) => {
     setError(null);
     try {
       const newComment = await api.comments.create(taskId, data);

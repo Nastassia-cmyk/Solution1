@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { Task } from '../types';
+import { Task, User } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 import { StatusBadge } from './StatusBadge';
 import { CommentSection } from './CommentSection';
@@ -7,14 +7,20 @@ import '../styles/TaskCard.css';
 
 interface TaskCardProps {
   task: Task;
-  teamMembers: string[];
+  users: User[];
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, teamMembers }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, users }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValues, setEditValues] = useState({ title: task.title, assignee: task.assignee || '' });
   const { updateTask, deleteTask, loading } = useAppContext();
+
+  const getUserName = (userId?: number): string => {
+    if (!userId) return 'Unassigned';
+    const user = users.find(u => u.id === userId);
+    return user ? user.name : `User ${userId}`;
+  };
 
   const handleStatusChange = async (newStatus: Task['status']) => {
     try {
@@ -29,7 +35,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, teamMembers }) => {
       if (field === 'title') {
         await updateTask(task.id, { title: editValues.title });
       } else if (field === 'assignee') {
-        await updateTask(task.id, { assignee: editValues.assignee || undefined });
+        await updateTask(task.id, { assignee: editValues.assignee ? parseInt(editValues.assignee as string) : undefined });
       }
       setEditingField(null);
     } catch (err) {
@@ -91,13 +97,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, teamMembers }) => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <option value="">Unassigned</option>
-                  {teamMembers.map(member => (
-                    <option key={member} value={member}>{member}</option>
+                  {users.map(user => (
+                    <option key={user.id} value={user.id}>{user.name}</option>
                   ))}
                 </select>
               ) : (
                 <span onDoubleClick={() => { setEditingField('assignee'); setEditValues({ ...editValues, assignee: task.assignee || '' }); }}>
-                  {task.assignee || 'Unassigned'}
+                  {getUserName(task.assignee)}
                 </span>
               )}
             </div>
@@ -106,7 +112,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, teamMembers }) => {
             </div>
           </div>
 
-          <CommentSection taskId={task.id} teamMembers={teamMembers} />
+          <CommentSection taskId={task.id} users={users} />
         </div>
       )}
     </div>

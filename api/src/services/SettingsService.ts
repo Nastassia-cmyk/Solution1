@@ -1,16 +1,24 @@
 ﻿import path from 'path';
 import fs from 'fs';
-import { AdminSettings, RepositoryType } from '../types';
+import { AdminSettings, RepositoryType, User } from '../types';
 import { safeWriteFile } from '../utils/fileOperations';
 
 const SETTINGS_FILE = path.join(__dirname, '..', 'data', 'settings.json');
+const DEFAULT_USERS: User[] = [
+  { id: 1, name: 'Alice', role: 'developer' },
+  { id: 2, name: 'Bob', role: 'developer' },
+  { id: 3, name: 'Charlie', role: 'developer' },
+  { id: 4, name: 'Diana', role: 'designer' },
+  { id: 5, name: 'Eve', role: 'developer' }
+];
 const DEFAULT_SETTINGS: AdminSettings = {
-  taskRepo: 'memory'
+  taskRepo: 'memory',
+  users: DEFAULT_USERS
 };
 
 /**
  * Service for managing admin settings
- * Handles reading and persisting settings like repository type
+ * Handles reading and persisting settings like repository type and users list
  */
 class SettingsService {
   /**
@@ -84,8 +92,13 @@ class SettingsService {
       return DEFAULT_SETTINGS;
     }
 
+    const users = Array.isArray(settings.users) && settings.users.length > 0 
+      ? settings.users 
+      : DEFAULT_USERS;
+
     return {
-      taskRepo: taskRepo as RepositoryType
+      taskRepo: taskRepo as RepositoryType,
+      users
     };
   }
 }

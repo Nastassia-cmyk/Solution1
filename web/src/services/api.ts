@@ -1,4 +1,4 @@
-﻿import { Task, Comment } from '../types';
+﻿import { Task, Comment, AdminSettings } from '../types';
 
 const API_BASE = '/api';
 
@@ -14,7 +14,7 @@ export const api = {
       if (!res.ok) throw new Error('Failed to fetch task');
       return res.json();
     },
-    create: async (data: { title: string; description: string; assignee?: string }): Promise<Task> => {
+    create: async (data: { title: string; description: string; assignee?: number }): Promise<Task> => {
       const res = await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,7 +43,7 @@ export const api = {
       if (!res.ok) throw new Error('Failed to fetch comments');
       return res.json();
     },
-    create: async (taskId: string, data: { author: string; text: string }): Promise<Comment> => {
+    create: async (taskId: string, data: { author: number; text: string }): Promise<Comment> => {
       const res = await fetch(`${API_BASE}/tasks/${taskId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,6 +55,13 @@ export const api = {
     delete: async (commentId: string): Promise<void> => {
       const res = await fetch(`${API_BASE}/tasks/comments/${commentId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete comment');
+    },
+  },
+  settings: {
+    get: async (): Promise<AdminSettings> => {
+      const res = await fetch(`${API_BASE}/admin/settings`);
+      if (!res.ok) throw new Error('Failed to fetch settings');
+      return res.json();
     },
   },
 };

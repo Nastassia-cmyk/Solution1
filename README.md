@@ -1,15 +1,15 @@
-﻿﻿﻿﻿﻿# Task Manager MVP
+﻿﻿﻿﻿﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
 ## Features
 
 - **Task Management**: Create, read, update, and delete tasks
-- **Task Assignment**: Assign tasks to team members
+- **Task Assignment**: Assign tasks to team members by user ID
 - **Status Tracking**: Track task status (To Do, In Progress, Done)
-- **Comments**: Add and manage comments on tasks
+- **Comments**: Add and manage comments on tasks (linked to user IDs)
 - **Filtering**: Filter tasks by status
-- **Team Members**: Pre-configured team members for assignment and comments
+- **Centralized User Management**: Team members defined in `api/data/settings.json` with IDs, names, and roles
 - **Flexible Storage**: Choose between in-memory or persistent JSON file storage
 - **Admin Dashboard**: Separate admin interface for system administration and settings
 - **Admin Overview**: View task statistics and completed tasks at a glance
@@ -330,7 +330,7 @@ POST /api/tasks
 {
   "title": "Design new landing page",
   "description": "Create mockups and design for new homepage",
-  "assignee": "Alice"
+  "assignee": 4
 }
 ```
 
@@ -339,7 +339,7 @@ POST /api/tasks
 PATCH /api/tasks/abc123
 {
   "status": "in-progress",
-  "assignee": "Bob"
+  "assignee": 2
 }
 ```
 
@@ -347,7 +347,7 @@ PATCH /api/tasks/abc123
 ```json
 POST /api/tasks/abc123/comments
 {
-  "author": "Charlie",
+  "author": 3,
   "text": "Started working on this task"
 }
 ```
@@ -358,7 +358,14 @@ GET /api/admin/settings
 
 Response:
 {
-  "taskRepo": "memory"
+  "taskRepo": "memory",
+  "users": [
+    { "id": 1, "name": "Alice", "role": "developer" },
+    { "id": 2, "name": "Bob", "role": "developer" },
+    { "id": 3, "name": "Charlie", "role": "developer" },
+    { "id": 4, "name": "Diana", "role": "designer" },
+    { "id": 5, "name": "Eve", "role": "developer" }
+  ]
 }
 ```
 
@@ -374,12 +381,22 @@ Response:
   "success": true,
   "message": "Settings saved successfully. Server restart required to apply changes.",
   "settings": {
-    "taskRepo": "json"
+    "taskRepo": "json",
+    "users": [...]
   }
 }
 ```
 
 ## Data Models
+
+### User
+```typescript
+{
+  id: number              // Unique user identifier
+  name: string            // User's display name
+  role: string            // User's role (e.g., 'developer', 'designer')
+}
+```
 
 ### Task
 ```typescript
@@ -388,7 +405,7 @@ Response:
   title: string
   description: string
   status: TaskStatus      // 'todo' | 'in-progress' | 'done'
-  assignee?: string       // Optional team member
+  assignee?: number       // Optional user ID
   createdAt: Date
   updatedAt: Date
 }
@@ -399,22 +416,51 @@ Response:
 {
   id: string              // UUID
   taskId: string
-  author: string          // Team member name
+  author: number          // User ID
   text: string
   createdAt: Date
 }
 ```
 
-## Team Members (MVP)
+## Team Members
 
-The following team members are available for assignment:
-- Alice
-- Bob
-- Charlie
-- Diana
-- Eve
+The team members are centralized in `api/data/settings.json`. The default team includes:
 
-These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
+- Alice (developer)
+- Bob (developer)
+- Charlie (developer)
+- Diana (designer)
+- Eve (developer)
+
+### Modifying Team Members
+
+To modify the team members:
+
+1. Edit `api/data/settings.json` and update the `users` array
+2. Ensure each user has:
+   - `id` (unique number)
+   - `name` (string)
+   - `role` (string)
+3. Restart the backend server for changes to take effect
+
+Example:
+```json
+{
+  "taskRepo": "json",
+  "users": [
+    { "id": 1, "name": "Alice", "role": "developer" },
+    { "id": 2, "name": "Bob", "role": "developer" },
+    { "id": 3, "name": "Charlie", "role": "developer" },
+    { "id": 4, "name": "Diana", "role": "designer" },
+    { "id": 5, "name": "Eve", "role": "developer" }
+  ]
+}
+```
+
+**Important**: When updating users, ensure that:
+- All user IDs are unique
+- All user IDs used in existing tasks and comments exist in the users list
+- IDs should be consistent (don't change existing user IDs)
 
 ## Features Overview
 
