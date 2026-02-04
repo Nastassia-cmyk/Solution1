@@ -3,7 +3,7 @@
   "users": [
     { "id": 1, "name": "Alice", "role": "developer" },
     { "id": 2, "name": "Bob", "role": "developer" },
-    { "id": 3, "name": "Charlie", "role": "developer" },
+    { "id": 3, "name": "Charlie", "role": "QA" },
     { "id": 4, "name": "Diana", "role": "designer" },
     { "id": 5, "name": "Eve", "role": "developer" }
   ]

@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿﻿import React, { useState, useEffect } from 'react';
 import AdminOverviewPage from '../pages/AdminOverviewPage';
+import AdminUsersPage from '../pages/AdminUsersPage';
 import SettingsPage from '../pages/SettingsPage';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { AppProvider } from '../../context/AppContext';
@@ -28,6 +29,10 @@ export const AdminLayout: React.FC = () => {
           <AdminOverviewPage />
         </AppProvider>
       );
+    }
+
+    if (currentAdminRoute === '/admin/users') {
+      return <AdminUsersPage />;
     }
 
     if (currentAdminRoute === '/admin/settings') {
@@ -75,7 +80,14 @@ export const AdminLayout: React.FC = () => {
                     Overview
                   </a>
                 </li>
-                <li><a href="#/admin/users" className="admin-menu-item">Users</a></li>
+                <li>
+                  <a 
+                    href="#/admin/users" 
+                    className={`admin-menu-item ${currentAdminRoute === '/admin/users' ? 'active' : ''}`}
+                  >
+                    Users
+                  </a>
+                </li>
                 <li>
                   <a 
                     href="#/admin/settings" 
