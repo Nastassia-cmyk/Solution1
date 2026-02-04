@@ -1,12 +1,19 @@
-﻿import React, { useEffect } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
+import { User } from '../../types';
+import { settingsApi } from '../../services/settingsApi';
 import '../../styles/AdminOverviewPage.css';
 
 export const AdminOverviewPage: React.FC = () => {
   const { tasks, loadTasks, loading, error } = useAppContext();
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     loadTasks();
+    // Load users from settings
+    settingsApi.getSettings()
+      .then(settings => setUsers(settings.users))
+      .catch(err => console.error('Failed to load users:', err));
   }, [loadTasks]);
 
   // Calculate status counts
@@ -30,6 +37,12 @@ export const AdminOverviewPage: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatAssignee = (assigneeId?: number) => {
+    if (!assigneeId) return '-';
+    const user = users.find(u => u.id === assigneeId);
+    return user ? `${user.name} (${user.role})` : '-';
   };
 
   return (
@@ -87,7 +100,7 @@ export const AdminOverviewPage: React.FC = () => {
                     {completedTasks.map(task => (
                       <tr key={task.id}>
                         <td className="task-title">{task.title}</td>
-                        <td className="task-assignee">{task.assignee || '-'}</td>
+                        <td className="task-assignee">{formatAssignee(task.assignee)}</td>
                         <td className="task-date">{formatDate(task.updatedAt)}</td>
                       </tr>
                     ))}
