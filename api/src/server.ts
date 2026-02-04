@@ -1,15 +1,25 @@
-﻿﻿import express, { Express, Request, Response, NextFunction } from 'express';
+﻿import express, { Express, Request, Response, NextFunction } from 'express';
 import taskRoutes from './routes/taskRoutes';
 import adminRoutes from './routes/adminRoutes';
 import taskService from './services/TaskService';
 import { RepositoryFactory } from './repositories/RepositoryFactory';
+import settingsService from './services/SettingsService';
 
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
 
-// Initialize repository and inject into TaskService
-const repository = RepositoryFactory.createRepository();
-taskService.setRepository(repository);
+// Initialize repository based on settings.json configuration
+console.log('[Startup] Initializing TaskService...');
+const settings = settingsService.getSettings();
+console.log(`[Startup] Repository configuration from settings.json: taskRepo="${settings.taskRepo}"`);
+try {
+  const repository = RepositoryFactory.createRepository(settings.taskRepo);
+  taskService.setRepository(repository);
+  console.log('[Startup] TaskService initialized successfully');
+} catch (error) {
+  console.error('[Startup] Failed to initialize repository:', error);
+  process.exit(1);
+}
 
 // Middleware
 app.use(express.json());

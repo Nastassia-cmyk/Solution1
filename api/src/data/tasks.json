@@ -1,0 +1,31 @@
+{
+  "tasks": [
+    {
+      "id": "ddab7505-36b9-4f8e-a325-c623df8e9b0a",
+      "title": "Test Task",
+      "description": "This is a test task",
+      "assignee": "Alice",
+      "status": "in-progress",
+      "createdAt": "2026-02-04T17:56:32.710Z",
+      "updatedAt": "2026-02-04T17:59:39.319Z"
+    },
+    {
+      "id": "baf634ea-81d5-452c-a1cb-5a991b40384b",
+      "title": "Task 1",
+      "description": "qwerty",
+      "assignee": "Eve",
+      "status": "todo",
+      "createdAt": "2026-02-04T17:59:26.151Z",
+      "updatedAt": "2026-02-04T17:59:26.151Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "d6c2067b-040f-4585-97ae-c203ba573051",
+      "taskId": "baf634ea-81d5-452c-a1cb-5a991b40384b",
+      "author": "Bob",
+      "text": "qwerty",
+      "createdAt": "2026-02-04T17:59:33.887Z"
+    }
+  ]
+}

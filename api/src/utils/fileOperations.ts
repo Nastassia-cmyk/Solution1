@@ -53,7 +53,8 @@ export function safeReadJsonFile<T>(filePath: string): T {
     const content = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    throw new Error(`Failed to read or parse JSON file at ${filePath}: ${error}`);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to read or parse JSON file at ${filePath}: ${errorMsg}`);
   }
 }
 

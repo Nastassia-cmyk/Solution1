@@ -7,6 +7,7 @@ export const getAllTasks = (req: Request, res: Response) => {
     const tasks = taskService.getAllTasks();
     res.json(tasks);
   } catch (error) {
+    console.error('[TaskController] getAllTasks error:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
 };
@@ -21,6 +22,7 @@ export const getTaskById = (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error) {
+    console.error('[TaskController] getTaskById error:', error);
     res.status(500).json({ error: 'Failed to fetch task' });
   }
 };
@@ -35,6 +37,7 @@ export const createTask = (req: Request, res: Response) => {
     const task = taskService.createTask({ title, description, assignee });
     res.status(201).json(task);
   } catch (error) {
+    console.error('[TaskController] createTask error:', error);
     res.status(500).json({ error: 'Failed to create task' });
   }
 };
@@ -49,6 +52,7 @@ export const updateTask = (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error) {
+    console.error('[TaskController] updateTask error:', error);
     res.status(500).json({ error: 'Failed to update task' });
   }
 };
@@ -63,6 +67,7 @@ export const deleteTask = (req: Request, res: Response) => {
     }
     res.json({ message: 'Task deleted successfully' });
   } catch (error) {
+    console.error('[TaskController] deleteTask error:', error);
     res.status(500).json({ error: 'Failed to delete task' });
   }
 };
@@ -78,6 +83,7 @@ export const getTaskComments = (req: Request, res: Response) => {
     const comments = taskService.getTaskComments(taskId);
     res.json(comments);
   } catch (error) {
+    console.error('[TaskController] getTaskComments error:', error);
     res.status(500).json({ error: 'Failed to fetch comments' });
   }
 };
@@ -97,6 +103,7 @@ export const addComment = (req: Request, res: Response) => {
     }
     res.status(201).json(comment);
   } catch (error) {
+    console.error('[TaskController] addComment error:', error);
     res.status(500).json({ error: 'Failed to add comment' });
   }
 };
@@ -111,6 +118,7 @@ export const deleteComment = (req: Request, res: Response) => {
     }
     res.json({ message: 'Comment deleted successfully' });
   } catch (error) {
+    console.error('[TaskController] deleteComment error:', error);
     res.status(500).json({ error: 'Failed to delete comment' });
   }
 };

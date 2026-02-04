@@ -24,12 +24,47 @@ export class JsonTaskRepository implements ITaskRepository {
   private filePath: string;
 
   constructor() {
-    // Resolve data directory path relative to project root
-    this.dataDir = path.resolve(process.cwd(), 'api', 'data');
+    // Resolve data directory path relative to this file's location
+    // Using __dirname ensures correct path regardless of where server is started from
+    this.dataDir = path.resolve(__dirname, '..', 'data');
     this.filePath = path.join(this.dataDir, 'tasks.json');
     
     // Ensure data directory exists
     ensureDir(this.dataDir);
+    
+    // Initialize tasks.json with proper structure if it doesn't exist
+    this.initializeFile();
+  }
+
+  /**
+   * Initialize tasks.json file with proper structure if it's missing or invalid
+   */
+  private initializeFile(): void {
+    const fs = require('fs');
+    
+    try {
+      if (!fs.existsSync(this.filePath)) {
+        // File doesn't exist, create it with initial structure
+        const initialData: StoredData = { tasks: [], comments: [] };
+        const content = JSON.stringify(initialData, null, 2);
+        safeWriteFile(this.filePath, content);
+        console.log('[JsonTaskRepository] Initialized tasks.json');
+      } else {
+        // File exists, verify it can be parsed
+        try {
+          const content = fs.readFileSync(this.filePath, 'utf-8');
+          JSON.parse(content);
+        } catch (parseError) {
+          // File is corrupted, reinitialize it
+          console.warn('[JsonTaskRepository] Found corrupted tasks.json, reinitializing...');
+          const initialData: StoredData = { tasks: [], comments: [] };
+          const content = JSON.stringify(initialData, null, 2);
+          safeWriteFile(this.filePath, content);
+        }
+      }
+    } catch (error) {
+      console.error('[JsonTaskRepository] Error initializing tasks.json:', error);
+    }
   }
 
   /**
@@ -38,7 +73,11 @@ export class JsonTaskRepository implements ITaskRepository {
    */
   private loadData(): StoredData {
     const data = safeReadJsonFile<StoredData>(this.filePath);
-    return data || { tasks: [], comments: [] };
+    // Ensure data has the required structure, even if file doesn't exist or is empty
+    return {
+      tasks: (data && data.tasks) ? data.tasks : [],
+      comments: (data && data.comments) ? data.comments : []
+    };
   }
 
   /**

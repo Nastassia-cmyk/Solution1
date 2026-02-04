@@ -1,4 +1,4 @@
-﻿﻿﻿# Task Manager MVP
+﻿﻿﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
@@ -133,32 +133,51 @@ npm install
 
 ### Data Persistence
 
-The Task Manager supports flexible data persistence strategies configured via the `TASK_REPO` environment variable:
+The Task Manager supports flexible data persistence strategies. The repository type is configured through `api/data/settings.json`, which is read on server startup.
+
+#### Configuration Priority
+
+On server startup, the repository type is determined in this order:
+1. **`api/data/settings.json`** (if file exists and is valid) - **Primary configuration**
+2. **`TASK_REPO` environment variable** (fallback)
+3. **Default to `memory`** (if neither above is configured)
 
 #### In-Memory Mode (Default)
-- **Environment**: `TASK_REPO=memory` (or not set)
+- **Configuration**: `"taskRepo": "memory"` in `api/data/settings.json` or `TASK_REPO=memory`
 - **Storage**: Data stored in application memory using Maps
 - **Persistence**: Data is lost when the application restarts
 - **Use Case**: Development, testing, prototyping
-- **No setup required**: Works out of the box
+- **Default behavior**: If `settings.json` is missing, the server defaults to in-memory mode
 
 #### JSON File Mode
-- **Environment**: `TASK_REPO=json`
+- **Configuration**: `"taskRepo": "json"` in `api/data/settings.json` or `TASK_REPO=json`
 - **Storage**: Data persisted to `api/data/tasks.json`
 - **Persistence**: Data survives application restarts
 - **Features**: Atomic writes using temp file + rename pattern (prevents corruption)
 - **Use Case**: Production, persistent data storage
 
-### Setting Environment Variables
+### Setting Repository Type
 
-#### Option 1: Create `.env` file in `api/` folder
-```bash
-cd api
-cp .env.example .env
-# Edit .env and set: TASK_REPO=json
+#### Option 1: Configure via Admin Settings (Recommended)
+1. Navigate to `http://localhost:3000/#/admin/settings`
+2. Select repository type from the dropdown
+3. Click "Save Settings"
+4. A notification will appear indicating server restart is required
+5. Restart the backend server to apply changes
+6. The new setting is persisted to `api/data/settings.json`
+
+#### Option 2: Manual Configuration via settings.json
+Edit `api/data/settings.json` directly:
+```json
+{
+  "taskRepo": "json"
+}
 ```
+Then restart the backend server.
 
-#### Option 2: Set environment variable before running
+#### Option 3: Environment Variable (Legacy)
+If `settings.json` is missing, you can set the `TASK_REPO` environment variable before starting the server.
+
 **Linux/Mac:**
 ```bash
 cd api
@@ -178,13 +197,38 @@ set TASK_REPO=json
 npm run dev
 ```
 
-#### Option 3: Use .env during production
-When running the compiled application, load the .env file using dotenv:
+#### Option 4: Create `.env` file in `api/` folder (for environment variables)
 ```bash
-node -r dotenv/config dist/server.js
+cd api
+cp .env.example .env
+# Edit .env and set: TASK_REPO=json
 ```
 
 ## Running the Application
+
+### Server Startup Behavior
+
+When you start the backend server, it performs the following initialization sequence:
+
+1. **Read Configuration**: Loads `api/data/settings.json` to determine the repository type
+   - If the file exists and contains a valid `taskRepo` setting, that value is used
+   - If the file is missing or invalid, defaults to `"memory"` mode
+2. **Initialize Repository**: Creates a TaskRepository instance based on the configuration
+   - In-Memory: Creates an in-memory storage using Maps
+   - JSON: Creates a JSON file-based storage that reads from/writes to `api/data/tasks.json`
+   - Automatically creates missing files with proper structure
+   - Automatically detects and recovers from corrupted files
+3. **Start Server**: Begins listening on port 5000
+4. **Log Configuration**: Prints detailed initialization logs for verification
+
+Example startup output:
+```
+[Startup] Initializing TaskService...
+[Startup] Repository configuration from settings.json: taskRepo="json"
+[Repository] Using JsonTaskRepository
+[Startup] TaskService initialized successfully
+Server is running on http://localhost:5000
+```
 
 ### Start Backend (Terminal 1)
 
@@ -197,8 +241,15 @@ The server will run on `http://localhost:5000`
 
 **Available scripts:**
 - `npm run dev` - Run with ts-node (development)
-- `npm run build` - Compile TypeScript
+- `npm run build` - Compile TypeScript and copy data files
 - `npm start` - Run compiled JavaScript
+
+**Build Process:**
+The `npm run build` command performs two steps:
+1. Compiles TypeScript source files to JavaScript in the `dist/` directory
+2. Copies JSON data files from `src/data/` to `dist/data/` using the `scripts/copy-data.js` script
+
+This ensures that `api/data/settings.json` is available in the production build.
 
 ### Start Frontend (Terminal 2)
 
@@ -395,7 +446,8 @@ These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
 - Change repository type through a dropdown selector
 - Orange warning message indicates that server restart is required to apply changes
 - Settings are persisted to `api/data/settings.json`
-- After saving settings, you must restart the backend server for changes to take effect
+- **Important**: The repository type is read from `settings.json` when the server starts. After changing settings, you must restart the backend server for the new repository type to take effect.
+- The new repository type becomes active only after the server restarts and reads the updated `settings.json`
 
 ## Development Notes
 
@@ -449,6 +501,32 @@ These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
   - The file `api/data/tasks.json` exists with task data
   - The `api/data/` directory has write permissions
   - Set `TASK_REPO=json` environment variable before starting the app
+
+### "Failed to create task" or "Failed to fetch tasks" in JSON mode
+- **Issue**: These errors occur when `api/data/tasks.json` is malformed (missing opening brace `{`, invalid JSON, or encoding issues with BOM)
+- **Automatic Recovery**: Starting from the latest version, the server automatically detects and fixes corrupted `tasks.json` files:
+  - On startup, if the file is missing, it will be automatically created with proper structure
+  - If the file exists but is corrupted/unparseable, it will be automatically reset with valid structure
+  - Check the server logs for `[JsonTaskRepository]` messages to see if recovery occurred
+- **Manual Fix**: If needed, ensure `api/data/tasks.json` contains valid JSON:
+  ```json
+  {
+    "tasks": [],
+    "comments": []
+  }
+  ```
+- **Reset**: Delete the corrupted `tasks.json` file and restart the server. It will automatically recreate the file with valid structure.
+- **Encoding**: The file must be saved as UTF-8 (without BOM). If you're manually editing the file, ensure proper encoding.
+- **Debugging**: If you still see errors, check the server console output for detailed error messages prefixed with `[TaskController]` or `[JsonTaskRepository]`. These logs show the exact nature of the error.
+
+### Server console logs show detailed error information
+- **[Startup]** logs: Show how the repository is being initialized
+- **[Repository]** logs: Show which repository type is being used
+- **[JsonTaskRepository]** logs: Show initialization and recovery of tasks.json
+- **[TaskController]** logs: Show detailed error messages when API operations fail
+- **[SettingsService]** logs: Show issues with reading or writing settings.json
+
+These detailed logs help troubleshoot issues quickly. If you encounter an error, check the server console first.
 
 ## Project Structure Principles
 
