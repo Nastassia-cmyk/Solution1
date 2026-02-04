@@ -43,11 +43,11 @@ export const AdminLayout: React.FC = () => {
       );
     }
 
+    // Default to overview page
     return (
-      <div className="admin-welcome">
-        <h2>Welcome to Admin Dashboard</h2>
-        <p>Select an option from the sidebar to get started.</p>
-      </div>
+      <AppProvider>
+        <AdminOverviewPage />
+      </AppProvider>
     );
   };
 

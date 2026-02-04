@@ -1,29 +1,35 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { User } from '../../types';
+import { User, Task } from '../../types';
 import { settingsApi } from '../../services/settingsApi';
+import { api } from '../../services/api';
 import '../../styles/AdminUsersPage.css';
 
 export const AdminUsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadUsers = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const settings = await settingsApi.getSettings();
+        const [settings, allTasks] = await Promise.all([
+          settingsApi.getSettings(),
+          api.tasks.getAll(),
+        ]);
         setUsers(settings.users);
+        setTasks(allTasks);
         setError(null);
       } catch (err) {
-        setError('Failed to load users');
-        console.error('Failed to load users:', err);
+        setError('Failed to load data');
+        console.error('Failed to load data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    loadUsers();
+    loadData();
   }, []);
 
   // Calculate role counts
@@ -33,6 +39,11 @@ export const AdminUsersPage: React.FC = () => {
   }, {} as Record<string, number>);
 
   const roles = Object.keys(roleCounts).sort();
+
+  // Helper function to count completed tasks for a user
+  const getCompletedTasksCount = (userId: number): number => {
+    return tasks.filter(task => task.assignee === userId && task.status === 'done').length;
+  };
 
   if (loading) {
     return <div className="admin-users-loading">Loading users...</div>;
@@ -71,6 +82,7 @@ export const AdminUsersPage: React.FC = () => {
                 <th>ID</th>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Total Completed Tasks</th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +94,9 @@ export const AdminUsersPage: React.FC = () => {
                     <span className={`role-badge role-${user.role}`}>
                       {user.role}
                     </span>
+                  </td>
+                  <td className="completed-tasks-cell">
+                    <span className="completed-tasks-badge">{getCompletedTasksCount(user.id)}</span>
                   </td>
                 </tr>
               ))}

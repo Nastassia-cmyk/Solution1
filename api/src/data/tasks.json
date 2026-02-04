@@ -14,9 +14,18 @@
       "title": "Task 1",
       "description": "qwerty",
       "assignee": 5,
-      "status": "todo",
+      "status": "done",
       "createdAt": "2026-02-04T17:59:26.151Z",
-      "updatedAt": "2026-02-04T17:59:26.151Z"
+      "updatedAt": "2026-02-04T19:03:43.464Z"
+    },
+    {
+      "id": "ebbcb627-3f31-4aea-a0c9-ce74bc3ee7c7",
+      "title": "Task 2",
+      "description": "Today is a beautiful day. The sun is shining, and the weather is warm. Many people are walking in the park, enjoying the fresh air. Some children are playing games, while others are riding bicycles. It is a perfect time to relax and spend time outside.",
+      "assignee": 3,
+      "status": "in-progress",
+      "createdAt": "2026-02-04T19:04:26.735Z",
+      "updatedAt": "2026-02-04T19:04:30.093Z"
     }
   ],
   "comments": [

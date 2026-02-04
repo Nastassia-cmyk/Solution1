@@ -195,6 +195,23 @@
   color: #512da8;
 }
 
+/* Completed Tasks Column */
+.completed-tasks-cell {
+  text-align: left;
+}
+
+.completed-tasks-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  min-width: 2rem;
+  text-align: center;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .admin-users-summary {
