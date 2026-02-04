@@ -5,9 +5,9 @@
       "title": "Test Task",
       "description": "This is a test task",
       "assignee": "Alice",
-      "status": "in-progress",
+      "status": "done",
       "createdAt": "2026-02-04T17:56:32.710Z",
-      "updatedAt": "2026-02-04T17:59:39.319Z"
+      "updatedAt": "2026-02-04T18:37:21.551Z"
     },
     {
       "id": "baf634ea-81d5-452c-a1cb-5a991b40384b",

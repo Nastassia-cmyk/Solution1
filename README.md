@@ -1,4 +1,4 @@
-﻿﻿﻿﻿# Task Manager MVP
+﻿﻿﻿﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
@@ -12,6 +12,7 @@ A modern task management application for small teams (3-10 people) built with No
 - **Team Members**: Pre-configured team members for assignment and comments
 - **Flexible Storage**: Choose between in-memory or persistent JSON file storage
 - **Admin Dashboard**: Separate admin interface for system administration and settings
+- **Admin Overview**: View task statistics and completed tasks at a glance
 - **Storage Configuration**: Change repository type (in-memory/JSON) through admin settings with restart notification
 - **Hash-Based Routing**: Navigate between Task Manager and Admin pages using URL hashes
 
@@ -79,6 +80,7 @@ Solution1/
 │   │   │   ├── RestartWarning.tsx # Restart notification
 │   │   │   ├── pages/           # Page components
 │   │   │   │   ├── TaskPage.tsx # Task manager page
+│   │   │   │   ├── AdminOverviewPage.tsx # Admin overview page
 │   │   │   │   ├── SettingsPage.tsx # Admin settings page
 │   │   │   │   ├── TaskPage.css
 │   │   │   │   └── SettingsPage.css
@@ -95,6 +97,7 @@ Solution1/
 │   │   │   ├── TaskCard.css
 │   │   │   ├── StatusBadge.css
 │   │   │   ├── CommentSection.css
+│   │   │   ├── AdminOverviewPage.css
 │   │   │   └── RestartWarning.css
 │   │   ├── App.css
 │   │   └── main.css
@@ -275,6 +278,7 @@ The frontend uses hash-based routing to navigate between different sections:
 |-------|-------------|
 | `/#/tasks` | Task Manager (default) - Main task management interface |
 | `/#/admin` | Admin Dashboard - Administration overview page |
+| `/#/admin/overview` | Admin Overview - View task statistics and completed tasks |
 | `/#/admin/settings` | Admin Settings - Configure storage type and system settings |
 
 ### Switching Between Routes
@@ -288,6 +292,7 @@ You can navigate between routes in two ways:
 2. **Using URL Hash**: Manually change the URL hash
    - Go to `http://localhost:3000/#/tasks` for task manager
    - Go to `http://localhost:3000/#/admin` for admin dashboard
+   - Go to `http://localhost:3000/#/admin/overview` for admin overview
    - Go to `http://localhost:3000/#/admin/settings` for settings
 
 ## API Endpoints
@@ -439,6 +444,19 @@ These can be modified in `web/src/App.tsx` → `TEAM_MEMBERS` constant.
 - Add comment with your name (team member dropdown)
 - Delete comments using the ✕ button
 - Comments auto-load when expanding a task
+
+### Admin Overview
+- Access via "Overview" in the admin sidebar (requires navigating to Admin Dashboard first)
+- View task statistics at a glance:
+  - Total number of tasks
+  - Count of tasks in each status (To Do, In Progress, Done)
+- Styled summary cards with color-coded status indicators
+- View the last 5 completed tasks in a table format:
+  - Task Title
+  - Assigned To (team member)
+  - Completion Date (with timestamp)
+- Empty state message shown if no completed tasks exist
+- Data source: All tasks from the backend API
 
 ### Admin Settings
 - Access via "Settings" in the admin sidebar (requires navigating to Admin Dashboard first)

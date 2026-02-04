@@ -1,6 +1,8 @@
-﻿﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import AdminOverviewPage from '../pages/AdminOverviewPage';
 import SettingsPage from '../pages/SettingsPage';
 import { SettingsProvider } from '../../context/SettingsContext';
+import { AppProvider } from '../../context/AppContext';
 import './AdminLayout.css';
 
 export const AdminLayout: React.FC = () => {
@@ -20,6 +22,14 @@ export const AdminLayout: React.FC = () => {
   }, []);
 
   const renderAdminContent = () => {
+    if (currentAdminRoute === '/admin/overview') {
+      return (
+        <AppProvider>
+          <AdminOverviewPage />
+        </AppProvider>
+      );
+    }
+
     if (currentAdminRoute === '/admin/settings') {
       return (
         <SettingsProvider>
@@ -57,7 +67,14 @@ export const AdminLayout: React.FC = () => {
             <div className="admin-sidebar-section">
               <h3>Navigation</h3>
               <ul className="admin-menu">
-                <li><a href="#/admin/overview" className="admin-menu-item">Overview</a></li>
+                <li>
+                  <a 
+                    href="#/admin/overview" 
+                    className={`admin-menu-item ${currentAdminRoute === '/admin/overview' ? 'active' : ''}`}
+                  >
+                    Overview
+                  </a>
+                </li>
                 <li><a href="#/admin/users" className="admin-menu-item">Users</a></li>
                 <li>
                   <a 
