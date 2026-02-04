@@ -1,4 +1,4 @@
-﻿﻿# Task Manager MVP
+﻿﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
@@ -11,6 +11,8 @@ A modern task management application for small teams (3-10 people) built with No
 - **Filtering**: Filter tasks by status
 - **Team Members**: Pre-configured team members for assignment and comments
 - **Flexible Storage**: Choose between in-memory or persistent JSON file storage
+- **Admin Dashboard**: Separate admin interface for system administration and settings
+- **Hash-Based Routing**: Navigate between Task Manager and Admin pages using URL hashes
 
 ## Tech Stack
 
@@ -26,6 +28,7 @@ A modern task management application for small teams (3-10 people) built with No
 - **TypeScript** for type safety
 - **Vite** as build tool
 - **CSS3** for styling (no external CSS framework in MVP)
+- **Hash-Based Routing** for client-side navigation between pages
 
 ## Architecture
 
@@ -57,7 +60,7 @@ Solution1/
 ├── web/                          # Frontend React App
 │   ├── src/
 │   │   ├── main.tsx             # React entry point
-│   │   ├── App.tsx              # Main app component
+│   │   ├── App.tsx              # Main app router component
 │   │   ├── types.ts             # TypeScript interfaces
 │   │   ├── context/
 │   │   │   └── AppContext.tsx   # Global state management
@@ -65,7 +68,13 @@ Solution1/
 │   │   │   ├── TaskForm.tsx     # Create task form
 │   │   │   ├── TaskCard.tsx     # Task display card
 │   │   │   ├── CommentSection.tsx # Comments UI
-│   │   │   └── StatusBadge.tsx  # Status indicator
+│   │   │   ├── StatusBadge.tsx  # Status indicator
+│   │   │   ├── pages/           # Page components
+│   │   │   │   ├── TaskPage.tsx # Task manager page
+│   │   │   │   └── TaskPage.css
+│   │   │   └── layouts/         # Layout components
+│   │   │       ├── AdminLayout.tsx # Admin dashboard layout
+│   │   │       └── AdminLayout.css
 │   │   ├── hooks/
 │   │   │   └── useAppContext.ts # Context hook
 │   │   ├── services/
@@ -192,6 +201,29 @@ The app will run on `http://localhost:3000`
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+
+## Navigation & Routes
+
+The frontend uses hash-based routing to navigate between different sections:
+
+### Available Routes
+
+| Route | Description |
+|-------|-------------|
+| `/#/tasks` | Task Manager (default) - Main task management interface |
+| `/#/admin` | Admin Dashboard - Administration and settings page |
+
+### Switching Between Routes
+
+You can navigate between routes in two ways:
+
+1. **Using Navigation Buttons**: Click the navigation buttons in the header
+   - "Tasks" button navigates to the task manager
+   - "Admin" button navigates to the admin dashboard
+
+2. **Using URL Hash**: Manually change the URL hash
+   - Go to `http://localhost:3000/#/tasks` for task manager
+   - Go to `http://localhost:3000/#/admin` for admin dashboard
 
 ## API Endpoints
 
