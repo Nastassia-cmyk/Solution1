@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import TaskPage from './components/pages/TaskPage';
+import MainLayout from './components/layouts/MainLayout';
 import AdminLayout from './components/layouts/AdminLayout';
 import './App.css';
 
@@ -23,7 +23,7 @@ export const App: React.FC = () => {
     return <AdminLayout />;
   }
 
-  return <TaskPage />;
+  return <MainLayout />;
 };
 
 export default App;

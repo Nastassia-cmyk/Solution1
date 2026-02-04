@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿# Task Manager MVP
+﻿﻿﻿﻿﻿﻿﻿﻿# Task Manager MVP
 
 A modern task management application for small teams (3-10 people) built with Node.js, React, and TypeScript.
 
@@ -88,7 +88,8 @@ Solution1/
 │   │   │   │   └── SettingsPage.css
 │   │   │   └── layouts/         # Layout components
 │   │   │       ├── AdminLayout.tsx # Admin dashboard layout
-│   │   │       └── AdminLayout.css
+│   │   │       ├── AdminLayout.css
+│   │   │       └── MainLayout.tsx # Main (non-admin) layout
 │   │   ├── hooks/
 │   │   │   └── useAppContext.ts # Context hook
 │   │   ├── services/
